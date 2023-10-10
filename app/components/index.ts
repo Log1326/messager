@@ -1,3 +1,6 @@
 export { AuthSocialButton } from './AuthSocialButton'
 export { Input } from './input/Input'
 export { Button } from './button/Button'
+export { EmptyState } from './EmptyState'
+export { DesktopSidebar } from './sidebars/DesktopSidebar'
+export { Avatar } from './Avatar'
