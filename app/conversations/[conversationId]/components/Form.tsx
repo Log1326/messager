@@ -1,9 +1,9 @@
 'use client'
+import axios from 'axios'
 import { useConversation } from '@/app/hooks'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
-import axios from 'axios'
 import { HiPaperAirplane, HiPhone } from 'react-icons/hi2'
-import { MessageInput } from '@/app/conversations/[conversationId]/components/MessageInput'
+import { MessageInput } from './MessageInput'
 
 export const Form = () => {
 	const { conversationId } = useConversation()
