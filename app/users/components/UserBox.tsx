@@ -17,7 +17,7 @@ export const UserBox: React.FC<UserBoxProps> = ({ data }) => {
 		axios
 			.post('/api/conversations', { userId: data.id })
 			.then(data => {
-				router.push(`${EnumRouters.CONVERSATION}/${data.data.id}`)
+				router.push(`${EnumRouters.CONVERSATIONS}/${data.data.id}`)
 			})
 			.finally(() => setIsLoading(false))
 	}, [data.id, router])

@@ -14,10 +14,10 @@ export function useRoutes() {
 		() => [
 			{
 				label: 'Chat',
-				href: EnumRouters.CONVERSATION,
+				href: EnumRouters.CONVERSATIONS,
 				icon: HiChat,
 				active:
-					pathname !== EnumRouters.CONVERSATION || !!conversationId
+					pathname !== EnumRouters.CONVERSATIONS || !!conversationId
 			},
 			{
 				label: 'Users',
