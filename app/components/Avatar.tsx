@@ -1,13 +1,15 @@
 'use client'
 import { User } from '@prisma/client'
 import Image from 'next/image'
+import clsx from 'clsx'
 
 interface AvatarProps {
 	user: User
+	classes?: string
 }
-export const Avatar: React.FC<AvatarProps> = ({ user }) => {
+export const Avatar: React.FC<AvatarProps> = ({ user, classes }) => {
 	return (
-		<div className='relative'>
+		<div className={clsx('relative', classes)}>
 			<div
 				className='relative inline-block rounded-full overflow-hidden
 				 h-9 w-9 md:h-11 md:w-11'
