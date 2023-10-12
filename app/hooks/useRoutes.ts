@@ -29,7 +29,7 @@ export function useRoutes() {
 				label: 'Logout',
 				href: EnumRouters.LOGOUT,
 				icon: HiArrowLeftOnRectangle,
-				onClick: () => signOut()
+				onClick: signOut
 			}
 		],
 		[conversationId, pathname]
