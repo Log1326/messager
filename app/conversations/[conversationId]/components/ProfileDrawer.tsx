@@ -5,8 +5,10 @@ import { Fragment, useMemo, useState } from 'react'
 import { format } from 'date-fns'
 import { Dialog, Transition } from '@headlessui/react'
 import { IoClose, IoTrash } from 'react-icons/io5'
-import { Avatar } from '@/app/components'
 import { ConfirmModal } from './ConfirmModal'
+import { AvatarGroup } from '@components/avatar/AvatarGroup'
+import { Avatar } from '@components/avatar/Avatar'
+import { useActiveList } from '@/app/hooks'
 
 interface ProfileDrawerProps {
 	data: Conversation & {
@@ -19,6 +21,9 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = props => {
 	const { onClose, isOpen, data } = props
 	const [isConfirmModal, setIsConfirmModal] = useState(false)
 	const otherUser = useOtherUser(data)
+	const { members } = useActiveList()
+	const isActive = members.indexOf(String(otherUser.email)) !== -1
+
 	const joinedDate = useMemo(
 		() => format(new Date(otherUser.createdAt), 'PP'),
 		[otherUser.createdAt]
@@ -29,7 +34,7 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = props => {
 	)
 	const statusText = useMemo(() => {
 		if (data.isGroup) return `${data.users.length} members`
-		return 'Active'
+		return isActive ? 'Active' : 'Offline'
 	}, [data.isGroup, data.users.length])
 	return (
 		<>
@@ -79,10 +84,15 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = props => {
 									</div>
 									<div className='relative mt-6 flex-1 px-4 sm:px-6'>
 										<div className='flex flex-col items-center'>
-											<Avatar
-												user={otherUser}
-												classes='mb-2'
-											/>
+											<div className='mt-2'>
+												{data.isGroup ? (
+													<AvatarGroup
+														users={data.users}
+													/>
+												) : (
+													<Avatar user={otherUser} />
+												)}
+											</div>
 											<h3 className='capitalize'>
 												{title}
 											</h3>
@@ -106,6 +116,23 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = props => {
 											</div>
 											<div className='w-full py-5 sm:p-0'>
 												<dl className='space-y-8 px-4 sm:space-y-6 sm:px-6'>
+													{data.isGroup && (
+														<div>
+															<dt className='text-sm  font-medium text-gray-500 sm:40 sm:flex-shrink-0'>
+																Email
+															</dt>
+															<dd className='mt-1 text-sm text-gray-900 sm:col-span-2'>
+																{data.users
+																	.map(
+																		({
+																			email
+																		}) =>
+																			email
+																	)
+																	.join(', ')}
+															</dd>
+														</div>
+													)}
 													{!data.isGroup && (
 														<div>
 															<dt className='text-sm  font-medium text-gray-500 sm:40 sm:flex-shrink-0'>

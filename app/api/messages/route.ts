@@ -1,25 +1,26 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@actions/getCurrentUser'
 import prisma from '@libs/prismadb'
+import { nextError } from '@libs/nextError'
+import { pusherServer } from '@libs/pusher'
 
 export async function POST(request: Request) {
 	try {
 		const currentUser = await getCurrentUser()
-		const body = await request.json()
-		const { message, image, conversationId } = body
+		const { message, image, conversationId } = await request.json()
 		if (!currentUser?.id || !currentUser?.email)
-			return new NextResponse('Unauthorized', { status: 401 })
+			nextError('Unauthorized', { status: 401 })
 		const newMessage = await prisma.message.create({
 			data: {
 				body: message,
 				image,
 				conversation: { connect: { id: conversationId } },
-				sender: { connect: { id: currentUser.id } },
-				seen: { connect: { id: currentUser.id } }
+				sender: { connect: { id: currentUser?.id } },
+				seen: { connect: { id: currentUser?.id } }
 			},
 			include: { seen: true, sender: true }
 		})
-		await prisma.conversation.update({
+		const updatedConversation = await prisma.conversation.update({
 			where: { id: conversationId },
 			data: {
 				lastMessageAt: new Date(),
@@ -27,9 +28,17 @@ export async function POST(request: Request) {
 			},
 			include: { users: true, messages: { include: { seen: true } } }
 		})
+		await pusherServer.trigger(conversationId, 'messages:new', newMessage)
+		const lastMessage = updatedConversation.messages.at(-1)
+		updatedConversation.users.map(user =>
+			pusherServer.trigger(String(user?.email), 'conversation:update', {
+				id: conversationId,
+				messages: [lastMessage]
+			})
+		)
 		return NextResponse.json(newMessage)
 	} catch (err) {
 		console.log(err, 'ERROR_MESSAGES')
-		return new NextResponse('Internal Error', { status: 500 })
+		nextError('Internal Error', { status: 500 })
 	}
 }

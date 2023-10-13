@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { signIn, SignInResponse, useSession } from 'next-auth/react'
-import { AuthSocialButton, Button, Input } from '@components/index'
-import { EnumRouters } from '@routes/index'
+import { EnumRouters } from '@/app/routes'
+import { Input } from '@components/input/Input'
+import { Button } from '@components/button/Button'
+import { AuthSocialButton } from '@components/AuthSocialButton'
 
 type Variant = 'LOGIN' | 'REGISTER'
 type VariantIcon = 'google' | 'github'
@@ -39,14 +41,18 @@ export const AuthForm = () => {
 		setIsLoading(false)
 		reset()
 	}, [reset])
-	const callbackFn = useCallback((callback: SignInResponse | undefined) => {
-		if (callback?.error && !callback?.ok) toast.error('Invalid credentials')
+	const callbackFn = useCallback(
+		(callback: SignInResponse | undefined) => {
+			if (callback?.error && !callback?.ok)
+				toast.error('Invalid credentials')
 
-		if (callback?.ok && !callback.error) {
-			toast.success('Logged in!')
-			router.push(EnumRouters.USERS)
-		}
-	}, [])
+			if (callback?.ok && !callback.error) {
+				toast.success('Logged in!')
+				router.push(EnumRouters.USERS)
+			}
+		},
+		[router]
+	)
 	const onSubmit: SubmitHandler<FieldValues> = data => {
 		setIsLoading(true)
 		if (REGISTER) {

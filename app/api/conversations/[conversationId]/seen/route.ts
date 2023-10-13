@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@actions/getCurrentUser'
 import prisma from '@libs/prismadb'
 import { nextError } from '@libs/nextError'
+import { pusherServer } from '@libs/pusher'
 
 type Params = {
 	params: {
@@ -28,6 +29,23 @@ export async function POST(
 			include: { sender: true, seen: true },
 			data: { seen: { connect: { id: currentUser?.id } } }
 		})
+		if (currentUser?.email)
+			await pusherServer.trigger(
+				currentUser?.email,
+				'conversation:update',
+				{
+					id: conversationId,
+					messages: [updatedMessage]
+				}
+			)
+		if (lastMessage.seenIds.indexOf(String(currentUser?.id)) !== -1)
+			return NextResponse.json(conversation)
+		if (conversationId)
+			await pusherServer.trigger(
+				conversationId,
+				'message:update',
+				updatedMessage
+			)
 		return NextResponse.json(updatedMessage)
 	} catch (err) {
 		console.log(err, 'ERROR_MESSAGE_SEEN')
