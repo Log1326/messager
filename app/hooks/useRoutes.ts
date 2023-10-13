@@ -1,7 +1,7 @@
 import { usePathname } from 'next/navigation'
 import { useConversation } from '@hooks/index'
 import { useMemo } from 'react'
-import { EnumRouters } from '@routes/index'
+import { EnumRouters } from '@/app/routes'
 import { HiChat, HiUser } from 'react-icons/hi'
 import { HiArrowLeftOnRectangle } from 'react-icons/hi2'
 import { DesktopDetails } from '@interface/desktop'

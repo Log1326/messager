@@ -1,7 +1,9 @@
-import Sidebar from '@components/sidebars/Sidebar'
-import { ConversationList } from './components/ConversationList'
-import { getConversations } from '@actions/getConversations'
 import { Metadata } from 'next'
+
+import Sidebar from '@components/sidebars/Sidebar'
+import getUsers from '@actions/getUsers'
+import { getConversations } from '@actions/getConversations'
+import { ConversationList } from './components/ConversationList'
 
 export const metadata: Metadata = {
 	title: 'Conversation',
@@ -14,10 +16,11 @@ export default async function conversationLayout({
 	children: React.ReactNode
 }) {
 	const conversations = await getConversations()
+	const users = await getUsers()
 	return (
 		<Sidebar>
 			<div className='h-full'>
-				<ConversationList initialItems={conversations} />
+				<ConversationList users={users} initialItems={conversations} />
 				{children}
 			</div>
 		</Sidebar>

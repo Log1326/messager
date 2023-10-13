@@ -1,8 +1,10 @@
 import { getConversationById } from '@actions/getConversationById'
 import { getMessages } from '@actions/getMessages'
-import { EmptyState } from '@/app/components'
-import { Body, Form, Header } from './components/index'
 import { getCurrentUser } from '@actions/getCurrentUser'
+import { Header } from '@/app/conversations/[conversationId]/components/Header'
+import { Body } from '@/app/conversations/[conversationId]/components/Body'
+import { Form } from '@/app/conversations/[conversationId]/components/Form'
+import { EmptyState } from '@components/EmptyState'
 
 type Params = {
 	params: {

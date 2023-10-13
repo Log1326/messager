@@ -5,8 +5,10 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { EnumRouters } from '@/app/routes'
 import { HiChevronLeft, HiEllipsisHorizontal } from 'react-icons/hi2'
-import { Avatar } from '@/app/components'
 import { ProfileDrawer } from './ProfileDrawer'
+import { AvatarGroup } from '@components/avatar/AvatarGroup'
+import { Avatar } from '@components/avatar/Avatar'
+import { useActiveList } from '@/app/hooks'
 
 interface HeaderProps {
 	conversation: Conversation & {
@@ -16,10 +18,12 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ conversation }) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false)
 	const otherUser = useOtherUser(conversation)
+	const { members } = useActiveList()
+	const isActive = members.indexOf(String(otherUser.email)) !== -1
 	const statusText = useMemo(() => {
 		if (conversation.isGroup) return `${conversation.users.length} members`
-		return 'Active'
-	}, [conversation.isGroup, conversation.users.length])
+		return isActive ? 'Active' : 'Offline'
+	}, [conversation.isGroup, conversation.users.length, isActive])
 	return (
 		<>
 			<ProfileDrawer
@@ -38,7 +42,11 @@ export const Header: React.FC<HeaderProps> = ({ conversation }) => {
 					>
 						<HiChevronLeft size={32} />
 					</Link>
-					<Avatar user={otherUser} />
+					{conversation.isGroup ? (
+						<AvatarGroup users={conversation.users} />
+					) : (
+						<Avatar user={otherUser} />
+					)}
 					<div className='flex flex-col'>
 						<div>{conversation.name || otherUser.name}</div>
 						<div className='text-sm font-light text-neutral-500'>
