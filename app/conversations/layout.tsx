@@ -1,9 +1,9 @@
 import { Metadata } from 'next'
 
-import Sidebar from '@components/sidebars/Sidebar'
 import getUsers from '@actions/getUsers'
 import { getConversations } from '@actions/getConversations'
 import { ConversationList } from './components/ConversationList'
+import { Sidebar } from '@/app/components'
 
 export const metadata: Metadata = {
 	title: 'Conversation',

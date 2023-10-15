@@ -38,7 +38,6 @@ export const Body: React.FC<BodyProps> = ({ initialMessages }) => {
 				})
 			)
 		}
-
 		pusherClient.bind('messages:new', handleMessages)
 		pusherClient.bind('message:update', handleUpdateMessage)
 
