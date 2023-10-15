@@ -7,8 +7,7 @@ import { useCallback, useMemo } from 'react'
 import { EnumRouters } from '@/app/routes'
 import clsx from 'clsx'
 import { format } from 'date-fns'
-import { AvatarGroup } from '@components/avatar/AvatarGroup'
-import { Avatar } from '@components/avatar/Avatar'
+import { Avatar, AvatarGroup } from '@/app/components'
 
 interface ConversationBoxProps {
 	data: FullConversationType
@@ -48,7 +47,7 @@ export const ConversationBox: React.FC<ConversationBoxProps> = ({
 		<div
 			onClick={handleClick}
 			className={clsx(
-				`w-full relative flex  items-center space-x-3 
+				`w-full relative flex items-center space-x-3 
 			hover:bg-neutral-100 rounded-lg transition cursor-pointer p-3
 	`,
 				selected ? 'bg-neutral-100' : 'bg-white'

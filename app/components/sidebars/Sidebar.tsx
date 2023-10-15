@@ -2,11 +2,7 @@ import { MobileFooter } from './MobileFooter'
 import { getCurrentUser } from '@actions/getCurrentUser'
 import { DesktopSidebar } from '@components/sidebars/DesktopSidebar'
 
-export default async function Sidebar({
-	children
-}: {
-	children: React.ReactNode
-}) {
+export async function Sidebar({ children }: { children: React.ReactNode }) {
 	const currentUser = await getCurrentUser()
 	return (
 		<div className='h-full'>

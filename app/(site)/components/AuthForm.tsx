@@ -1,47 +1,51 @@
 'use client'
-import axios from 'axios'
-import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 import { signIn, SignInResponse, useSession } from 'next-auth/react'
 import { EnumRouters } from '@/app/routes'
 import { Input } from '@components/input/Input'
 import { Button } from '@components/button/Button'
 import { AuthSocialButton } from '@components/AuthSocialButton'
+import { useHandlerSubmit } from '@hooks/useHandlerSubmit'
+import toast from 'react-hot-toast'
+import axios from 'axios'
+import { FieldValues } from 'react-hook-form'
 
 type Variant = 'LOGIN' | 'REGISTER'
-type VariantIcon = 'google' | 'github'
 export const AuthForm = () => {
 	const session = useSession()
 	const router = useRouter()
 	const [variant, setVariant] = useState<Variant>('LOGIN')
-	const [isLoading, setIsLoading] = useState(false)
 	const REGISTER = variant === 'REGISTER'
-	useEffect(() => {
-		if (session.status === 'authenticated') router.push(EnumRouters.USERS)
-	}, [router, session.status])
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-		reset
-	} = useForm<FieldValues>({
-		defaultValues: {
-			name: '',
-			email: '',
-			password: ''
+	const callback = (data: FieldValues) => {
+		if (REGISTER) {
+			axios
+				.post('/api/register', data)
+				.then(() => {
+					signIn('credentials', { ...data, redirect: false }).then(
+						thenFn
+					)
+				})
+				.catch(() => toast.error('Something went wrong'))
+				.finally(finallyFn)
+			return
 		}
+		signIn('credentials', { ...data, redirect: false })
+			.then(thenFn)
+			.finally(finallyFn)
+	}
+	const {
+		fn: { onSubmit, handleSubmit, setIsLoading, reset },
+		state: { register, errors, isLoading }
+	} = useHandlerSubmit({
+		defaultValues: { name: '', email: '', password: '' },
+		callback
 	})
-	const toggleVariant = useCallback(
-		() => (REGISTER ? setVariant('LOGIN') : setVariant('REGISTER')),
-		[REGISTER]
-	)
 	const finallyFn = useCallback(() => {
 		setIsLoading(false)
 		reset()
-	}, [reset])
-	const callbackFn = useCallback(
+	}, [reset, setIsLoading])
+	const thenFn = useCallback(
 		(callback: SignInResponse | undefined) => {
 			if (callback?.error && !callback?.ok)
 				toast.error('Invalid credentials')
@@ -53,23 +57,17 @@ export const AuthForm = () => {
 		},
 		[router]
 	)
-	const onSubmit: SubmitHandler<FieldValues> = data => {
+	const socialAction = (action: string) => () => {
 		setIsLoading(true)
-		if (REGISTER) {
-			axios
-				.post('/api/register', data)
-				.catch(() => toast.error('Something went wrong'))
-				.finally(finallyFn)
-			return
-		}
-		signIn('credentials', { ...data, redirect: false })
-			.then(callbackFn)
-			.finally(finallyFn)
+		signIn(action, { redirect: false }).then(thenFn).finally(finallyFn)
 	}
-	const socialAction = (action: VariantIcon) => {
-		setIsLoading(true)
-		signIn(action, { redirect: false }).then(callbackFn).finally(finallyFn)
-	}
+	const toggleVariant = useCallback(
+		() => (REGISTER ? setVariant('LOGIN') : setVariant('REGISTER')),
+		[REGISTER]
+	)
+	useEffect(() => {
+		if (session.status === 'authenticated') router.push(EnumRouters.USERS)
+	}, [router, session.status])
 	return (
 		<div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
 			<div className='bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10'>
@@ -122,11 +120,11 @@ export const AuthForm = () => {
 					<div className='mt-6 flex items-center gap-2'>
 						<AuthSocialButton
 							image='/images/github.png'
-							onClick={() => socialAction('github')}
+							onClick={socialAction('github')}
 						/>
 						<AuthSocialButton
 							image='/images/google.jpg'
-							onClick={() => socialAction('google')}
+							onClick={socialAction('google')}
 						/>
 					</div>
 				</div>

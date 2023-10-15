@@ -1,10 +1,6 @@
 'use client'
 import ReactSelect from 'react-select'
 
-type OptionsType = {
-	value: string
-	label: string | null
-}
 interface SelectProps {
 	disabled?: boolean
 	label: string
